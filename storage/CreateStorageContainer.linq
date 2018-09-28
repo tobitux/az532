@@ -13,3 +13,7 @@ var conainerName = Guid.NewGuid().ToString();
 var container = blobClient.GetContainerReference(conainerName);
 
 container.CreateIfNotExists();
+
+var blockBlobName = Guid.NewGuid().ToString();
+var blockBlob = container.GetBlockBlobReference(blockBlobName);
+blockBlob.UploadText("Hello World");
