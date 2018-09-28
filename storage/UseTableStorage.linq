@@ -30,20 +30,19 @@ void Main()
 		Color = colors[r.Next(colors.Length)]
 	};
 	
+	// insert car
 	var insert = TableOperation.Insert(car);
-
 	table.Execute(insert);
-
-	var retrieve = TableOperation.Retrieve<CarEntity>("car", id.ToString());
-
+	
+	// retrieve cars by query
 	table.ExecuteQuery(table.CreateQuery<CarEntity>()).Where(c => c.Year < 2000).ToList().Dump();
 
+	// retrieve single car
+	var retrieve = TableOperation.Retrieve<CarEntity>("car", id.ToString());
 	var result = table.Execute(retrieve);
-	
 	result.Dump();
 	
 	var ca = (CarEntity) result.Result;
-	
 	ca.Dump();
 }
 
