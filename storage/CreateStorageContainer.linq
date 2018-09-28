@@ -23,4 +23,5 @@ container.Metadata.Add("Author","Tobias Knapp");
 container.Metadata["AuthoredOn"] = DateTime.UtcNow.ToString();
 container.SetMetadata();
 
+container.FetchAttributes();
 container.Metadata.Dump();
