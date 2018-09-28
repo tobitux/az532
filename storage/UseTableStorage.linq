@@ -38,6 +38,8 @@ void Main()
 
 	table.ExecuteQuery(table.CreateQuery<CarEntity>()).Where(c => c.Year < 2000).ToList().Dump();
 
+	table.ExecuteQuery(table.CreateQuery<CarEntity>()).Where(c => c.Year >= 2000).ToList().Dump();
+
 	var result = table.Execute(retrieve);
 	
 	result.Dump();
