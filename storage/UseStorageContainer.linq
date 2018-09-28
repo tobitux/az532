@@ -4,7 +4,7 @@
   <Namespace>Microsoft.WindowsAzure.Storage.Blob</Namespace>
 </Query>
 
-var connectionString = Util.GetPassword("BlobConnectionString");
+var connectionString = Util.GetPassword("AzureStorageConnectionString");
 
 var storageAccount = CloudStorageAccount.Parse(connectionString);
 var blobClient = storageAccount.CreateCloudBlobClient();
@@ -25,3 +25,8 @@ container.SetMetadata();
 
 container.FetchAttributes();
 container.Metadata.Dump();
+
+var blockBlob2 = container.GetBlobReference(blockBlob.Name + "-Copy");
+var task = blockBlob2.StartCopyAsync(new Uri(blockBlob.Uri.AbsoluteUri));
+task.Wait();
+Console.WriteLine("Copied");
