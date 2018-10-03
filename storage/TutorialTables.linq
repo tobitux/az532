@@ -2,6 +2,7 @@
   <NuGetReference>WindowsAzure.Storage</NuGetReference>
   <Namespace>Microsoft.WindowsAzure.Storage</Namespace>
   <Namespace>Microsoft.WindowsAzure.Storage.Table</Namespace>
+  <Namespace>Microsoft.WindowsAzure.Storage.Table.Queryable</Namespace>
 </Query>
 
 /// https://docs.microsoft.com/en-us/azure/cosmos-db/table-storage-how-to-use-dotnet
@@ -39,14 +40,21 @@ async void Main()
 	table.ExecuteBatch(batchOperation);
 
 	var query = new TableQuery<CustomerEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Mendau"));
-
 	table.ExecuteQuery(query).Dump();
 
+	Console.WriteLine("Fluent");
 	query = new TableQuery<CustomerEntity>().Where(
 		TableQuery.CombineFilters(
 			TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Mendau"),
 			TableOperators.And,
 			TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.LessThan, "L")));
+
+	table.ExecuteQuery(query).Dump();
+
+	Console.WriteLine("LINQ");
+	query = (from ce in table.CreateQuery<CustomerEntity>()
+			 where ce.PartitionKey.Equals("Mendau") && ce.RowKey.CompareTo("L") < 0
+			 select ce).AsTableQuery();
 
 	table.ExecuteQuery(query).Dump();
 
@@ -77,26 +85,27 @@ async void Main()
 	EntityResolver<string> resolver = (pk, rk, ts, props, etag) => props.ContainsKey("Email") ? props["Email"].StringValue : null;
 
 	table.ExecuteQuery(projectionQuery, resolver, null, null).Dump();
-	
+
 	var deleteOperation = TableOperation.Delete(customer4);
-	
+
 	table.Execute(deleteOperation);
-	
-	
+
+
 	var tableQuery = new TableQuery<CustomerEntity>();
-	
+
 	TableContinuationToken continuationToken = null;
-	
-	do{
+
+	do
+	{
 		var tableQueryResult = await table.ExecuteQuerySegmentedAsync(tableQuery, continuationToken);
-		
+
 		continuationToken = tableQueryResult.ContinuationToken;
-		
+
 		tableQueryResult.Dump();
-		
-	}while (continuationToken != null);
-	
-	table.DeleteIfExists();	
+
+	} while (continuationToken != null);
+
+	table.DeleteIfExists();
 }
 
 public class CustomerEntity : TableEntity
